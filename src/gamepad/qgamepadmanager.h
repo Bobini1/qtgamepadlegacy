@@ -122,9 +122,9 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadConnected(int))
     Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadNameChanged(int, const QString&))
     Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadDisconnected(int))
-    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadAxisEvent(int, QGamepadManager::GamepadAxis, double))
-    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadButtonPressEvent(int, QGamepadManager::GamepadButton, double))
-    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadButtonReleaseEvent(int, QGamepadManager::GamepadButton))
+    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadAxisEvent(int, QGamepadManager::GamepadAxis, double, int64_t))
+    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadButtonPressEvent(int, QGamepadManager::GamepadButton, double, int64_t))
+    Q_PRIVATE_SLOT(d_func(), void _q_forwardGamepadButtonReleaseEvent(int, QGamepadManager::GamepadButton, int64_t))
 };
 
 QT_END_NAMESPACE

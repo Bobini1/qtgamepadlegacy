@@ -169,9 +169,9 @@ QGamepadManager::QGamepadManager() :
     connect(d->gamepadBackend, SIGNAL(gamepadAdded(int)), this, SLOT(_q_forwardGamepadConnected(int)));
     connect(d->gamepadBackend, SIGNAL(gamepadNamed(int, QString)), this, SLOT(_q_forwardGamepadNameChanged(int, QString)));
     connect(d->gamepadBackend, SIGNAL(gamepadRemoved(int)), this, SLOT(_q_forwardGamepadDisconnected(int)));
-    connect(d->gamepadBackend, SIGNAL(gamepadAxisMoved(int,QGamepadManager::GamepadAxis,double)), this, SLOT(_q_forwardGamepadAxisEvent(int,QGamepadManager::GamepadAxis,double)));
-    connect(d->gamepadBackend, SIGNAL(gamepadButtonPressed(int,QGamepadManager::GamepadButton,double)), this, SLOT(_q_forwardGamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double)));
-    connect(d->gamepadBackend, SIGNAL(gamepadButtonReleased(int,QGamepadManager::GamepadButton)), this, SLOT(_q_forwardGamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton)));
+    connect(d->gamepadBackend, SIGNAL(gamepadAxisMoved(int,QGamepadManager::GamepadAxis,double,int64_t)), this, SLOT(_q_forwardGamepadAxisEvent(int,QGamepadManager::GamepadAxis,double,int64_t)));
+    connect(d->gamepadBackend, SIGNAL(gamepadButtonPressed(int,QGamepadManager::GamepadButton,double,int64_t)), this, SLOT(_q_forwardGamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double,int64_t)));
+    connect(d->gamepadBackend, SIGNAL(gamepadButtonReleased(int,QGamepadManager::GamepadButton,int64_t)), this, SLOT(_q_forwardGamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton,int64_t)));
 
     connect(d->gamepadBackend, &QGamepadBackend::buttonConfigured, this, &QGamepadManager::buttonConfigured);
     connect(d->gamepadBackend, &QGamepadBackend::axisConfigured, this, &QGamepadManager::axisConfigured);
