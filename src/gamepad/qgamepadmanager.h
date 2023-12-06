@@ -106,9 +106,9 @@ Q_SIGNALS:
     void gamepadConnected(int deviceId);
     void gamepadNameChanged(int deviceId, const QString &name);
     void gamepadDisconnected(int deviceId);
-    void gamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value);
-    void gamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value);
-    void gamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button);
+    void gamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value, int64_t timestamp = 0);
+    void gamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value, int64_t timestamp = 0);
+    void gamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button, int64_t timestamp = 0);
     void buttonConfigured(int deviceId, QGamepadManager::GamepadButton button);
     void axisConfigured(int deviceId, QGamepadManager::GamepadAxis axis);
     void configurationCanceled(int deviceId);

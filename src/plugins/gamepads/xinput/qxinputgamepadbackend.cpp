@@ -38,6 +38,7 @@
 #include <QtCore/QThread>
 #include <qmath.h>
 #include <windows.h>
+#include <chrono>
 
 QT_BEGIN_NAMESPACE
 
@@ -138,16 +139,17 @@ void QXInputThread::dispatch(int idx, XINPUT_GAMEPAD *state)
         { XINPUT_GAMEPAD_X, QGamepadManager::ButtonX },
         { XINPUT_GAMEPAD_Y, QGamepadManager::ButtonY }
     };
+    int64_t time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     for (uint i = 0; i < sizeof(buttonMap) / sizeof(ButtonMap); ++i) {
         const unsigned short xb = buttonMap[i].xbutton;
         unsigned short isDown = state->wButtons & xb;
         if (isDown != (m_controllers[idx].buttons & xb)) {
             if (isDown) {
                 m_controllers[idx].buttons |= xb;
-                emit m_backend->gamepadButtonPressed(idx, buttonMap[i].qbutton, 1);
+                emit m_backend->gamepadButtonPressed(idx, buttonMap[i].qbutton, 1, time);
             } else {
                 m_controllers[idx].buttons &= ~xb;
-                emit m_backend->gamepadButtonReleased(idx, buttonMap[i].qbutton);
+                emit m_backend->gamepadButtonReleased(idx, buttonMap[i].qbutton, time);
             }
         }
     }
@@ -159,9 +161,9 @@ void QXInputThread::dispatch(int idx, XINPUT_GAMEPAD *state)
                   / (255.0 - XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
                 : 0.0;
         if (!qFuzzyIsNull(value))
-            emit m_backend->gamepadButtonPressed(idx, QGamepadManager::ButtonL2, value);
+            emit m_backend->gamepadButtonPressed(idx, QGamepadManager::ButtonL2, value, time);
         else
-            emit m_backend->gamepadButtonReleased(idx, QGamepadManager::ButtonL2);
+            emit m_backend->gamepadButtonReleased(idx, QGamepadManager::ButtonL2, time);
     }
     if (m_controllers[idx].triggers[1] != state->bRightTrigger) {
         m_controllers[idx].triggers[1] = state->bRightTrigger;
@@ -170,9 +172,9 @@ void QXInputThread::dispatch(int idx, XINPUT_GAMEPAD *state)
                   / (255.0 - XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
                 : 0.0;
         if (!qFuzzyIsNull(value))
-            emit m_backend->gamepadButtonPressed(idx, QGamepadManager::ButtonR2, value);
+            emit m_backend->gamepadButtonPressed(idx, QGamepadManager::ButtonR2, value, time);
         else
-            emit m_backend->gamepadButtonReleased(idx, QGamepadManager::ButtonR2);
+            emit m_backend->gamepadButtonReleased(idx, QGamepadManager::ButtonR2, time);
     }
 
     double x, y;
@@ -184,11 +186,11 @@ void QXInputThread::dispatch(int idx, XINPUT_GAMEPAD *state)
     }
     if (m_controllers[idx].axis[0][0] != x) {
         m_controllers[idx].axis[0][0] = x;
-        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisLeftX, x);
+        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisLeftX, x, time);
     }
     if (m_controllers[idx].axis[0][1] != y) {
         m_controllers[idx].axis[0][1] = y;
-        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisLeftY, y);
+        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisLeftY, y, time);
     }
     if (qSqrt(state->sThumbRX * state->sThumbRX + state->sThumbRY * state->sThumbRY) > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) {
         x = 2 * (state->sThumbRX + 32768.0) / 65535.0 - 1.0;
@@ -198,11 +200,11 @@ void QXInputThread::dispatch(int idx, XINPUT_GAMEPAD *state)
     }
     if (m_controllers[idx].axis[1][0] != x) {
         m_controllers[idx].axis[1][0] = x;
-        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisRightX, x);
+        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisRightX, x, time);
     }
     if (m_controllers[idx].axis[1][1] != y) {
         m_controllers[idx].axis[1][1] = y;
-        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisRightY, y);
+        emit m_backend->gamepadAxisMoved(idx, QGamepadManager::AxisRightY, y, time);
     }
 }
 

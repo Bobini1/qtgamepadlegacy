@@ -105,9 +105,9 @@ Q_SIGNALS:
     void gamepadAdded(int deviceId);
     void gamepadNamed(int deviceId, const QString &name);
     void gamepadRemoved(int deviceId);
-    void gamepadAxisMoved(int deviceId, QGamepadManager::GamepadAxis axis, double value);
-    void gamepadButtonPressed(int deviceId, QGamepadManager::GamepadButton button, double value);
-    void gamepadButtonReleased(int deviceId, QGamepadManager::GamepadButton button);
+    void gamepadAxisMoved(int deviceId, QGamepadManager::GamepadAxis axis, double value, int64_t timestamp = 0);
+    void gamepadButtonPressed(int deviceId, QGamepadManager::GamepadButton button, double value, int64_t timestamp = 0);
+    void gamepadButtonReleased(int deviceId, QGamepadManager::GamepadButton button, int64_t timestamp = 0);
 
 protected:
     QString m_settingsFilePath;

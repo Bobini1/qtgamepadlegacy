@@ -65,8 +65,8 @@ public:
     bool buttonR2Pressed;
     QMap<QGamepadManager::GamepadButton, Qt::Key> keyMapping;
 
-    void _q_processGamepadButtonPressEvent(int index, QGamepadManager::GamepadButton button, double value);
-    void _q_processGamepadButtonReleaseEvent(int index, QGamepadManager::GamepadButton button);
+    void _q_processGamepadButtonPressEvent(int index, QGamepadManager::GamepadButton button, double value, int64_t timestamp);
+    void _q_processGamepadButtonReleaseEvent(int index, QGamepadManager::GamepadButton button, int64_t timestamp);
 };
 
 void QGamepadKeyNavigationPrivate::sendGeneratedKeyEvent(QKeyEvent *event)
@@ -81,7 +81,7 @@ void QGamepadKeyNavigationPrivate::sendGeneratedKeyEvent(QKeyEvent *event)
         QGuiApplication::sendEvent(focusWindow, event);
 }
 
-void QGamepadKeyNavigationPrivate::_q_processGamepadButtonPressEvent(int index, QGamepadManager::GamepadButton button, double value)
+void QGamepadKeyNavigationPrivate::_q_processGamepadButtonPressEvent(int index, QGamepadManager::GamepadButton button, double value, int64_t timestamp)
 {
     Q_UNUSED(value);
     // If a gamepad has been set then, only use the events of that gamepad
@@ -99,10 +99,11 @@ void QGamepadKeyNavigationPrivate::_q_processGamepadButtonPressEvent(int index, 
         buttonR2Pressed = true;
 
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, keyMapping[button], Qt::NoModifier);
+    event->setTimestamp(timestamp);
     sendGeneratedKeyEvent(event);
 }
 
-void QGamepadKeyNavigationPrivate::_q_processGamepadButtonReleaseEvent(int index, QGamepadManager::GamepadButton button)
+void QGamepadKeyNavigationPrivate::_q_processGamepadButtonReleaseEvent(int index, QGamepadManager::GamepadButton button, int64_t timestamp)
 {
     // If a gamepad has been set then, only use the events of that gamepad
     if (gamepad && gamepad->deviceId() != index)
@@ -115,6 +116,7 @@ void QGamepadKeyNavigationPrivate::_q_processGamepadButtonReleaseEvent(int index
         buttonR2Pressed = false;
 
     QKeyEvent *event = new QKeyEvent(QEvent::KeyRelease, keyMapping[button], Qt::NoModifier);
+    event->setTimestamp(timestamp);
     sendGeneratedKeyEvent(event);
 }
 
@@ -156,10 +158,10 @@ QGamepadKeyNavigation::QGamepadKeyNavigation(QObject *parent)
     d->keyMapping.insert(QGamepadManager::ButtonL3, Qt::Key_Back);
     d->keyMapping.insert(QGamepadManager::ButtonR3, Qt::Key_Forward);
 
-    connect(d->gamepadManger, SIGNAL(gamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double)),
-            this, SLOT(_q_processGamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double)));
-    connect(d->gamepadManger, SIGNAL(gamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton)),
-            this, SLOT(_q_processGamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton)));
+    connect(d->gamepadManger, SIGNAL(gamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double,int64_t)),
+            this, SLOT(_q_processGamepadButtonPressEvent(int,QGamepadManager::GamepadButton,double,int64_t)));
+    connect(d->gamepadManger, SIGNAL(gamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton,int64_t)),
+            this, SLOT(_q_processGamepadButtonReleaseEvent(int,QGamepadManager::GamepadButton,int64_t)));
 }
 
 /*!

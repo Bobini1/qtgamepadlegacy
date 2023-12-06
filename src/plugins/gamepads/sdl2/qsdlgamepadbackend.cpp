@@ -59,6 +59,7 @@ void QSdlGamepadBackend::pumpSdlEventLoop()
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_CONTROLLERAXISMOTION) {
             SDL_ControllerAxisEvent axisEvent = event.caxis;
+            uint32_t timestamp = axisEvent.timestamp;
             //qDebug() << axisEvent.timestamp << "Axis Event: " << axisEvent.which << axisEvent.axis << axisEvent.value;
             double value;
             if (axisEvent.value >= 0)
@@ -67,28 +68,28 @@ void QSdlGamepadBackend::pumpSdlEventLoop()
                 value = axisEvent.value / 32768.0;
             switch (axisEvent.axis) {
                 case SDL_CONTROLLER_AXIS_LEFTX:
-                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisLeftX, value);
+                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisLeftX, value, timestamp);
                     break;
                 case SDL_CONTROLLER_AXIS_LEFTY:
-                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisLeftY, value);
+                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisLeftY, value, timestamp);
                     break;
                 case SDL_CONTROLLER_AXIS_RIGHTX:
-                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisRightX, value);
+                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisRightX, value, timestamp);
                     break;
                 case SDL_CONTROLLER_AXIS_RIGHTY:
-                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisRightY, value);
+                    emit gamepadAxisMoved(m_instanceIdForIndex[axisEvent.which], QGamepadManager::AxisRightY, value, timestamp);
                     break;
                 case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
                     if (value == 0)
-                        emit gamepadButtonReleased(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonL2);
+                        emit gamepadButtonReleased(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonL2, timestamp);
                     else
-                        emit gamepadButtonPressed(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonL2, value);
+                        emit gamepadButtonPressed(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonL2, value, timestamp);
                     break;
                 case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
                     if (value == 0)
-                        emit gamepadButtonReleased(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonR2);
+                        emit gamepadButtonReleased(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonR2, timestamp);
                     else
-                        emit gamepadButtonPressed(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonR2, value);
+                        emit gamepadButtonPressed(m_instanceIdForIndex[axisEvent.which], QGamepadManager::ButtonR2, value, timestamp);
                     break;
                 default:
                     break;
@@ -97,11 +98,11 @@ void QSdlGamepadBackend::pumpSdlEventLoop()
         } else if (event.type == SDL_CONTROLLERBUTTONDOWN) {
             SDL_ControllerButtonEvent buttonEvent = event.cbutton;
             //qDebug() << buttonEvent.timestamp << "Button Press: " << buttonEvent.which << buttonEvent.button << buttonEvent.state;
-            emit gamepadButtonPressed(m_instanceIdForIndex[buttonEvent.which], translateButton(buttonEvent.button), 1.0);
+            emit gamepadButtonPressed(m_instanceIdForIndex[buttonEvent.which], translateButton(buttonEvent.button), 1.0, buttonEvent.timestamp);
         } else if (event.type == SDL_CONTROLLERBUTTONUP) {
             SDL_ControllerButtonEvent buttonEvent = event.cbutton;
             //qDebug() << buttonEvent.timestamp << "Button Release: " << buttonEvent.which << buttonEvent.button << buttonEvent.state;
-            emit gamepadButtonReleased(m_instanceIdForIndex[buttonEvent.which], translateButton(buttonEvent.button));
+            emit gamepadButtonReleased(m_instanceIdForIndex[buttonEvent.which], translateButton(buttonEvent.button), buttonEvent.timestamp);
         } else if (event.type == SDL_CONTROLLERDEVICEADDED) {
             SDL_ControllerDeviceEvent deviceEvent = event.cdevice;
             //qDebug() << deviceEvent.timestamp << "Controller Added: " << deviceEvent.which;

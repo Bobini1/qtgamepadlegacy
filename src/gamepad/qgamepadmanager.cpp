@@ -66,9 +66,9 @@ public:
     void _q_forwardGamepadConnected(int deviceId);
     void _q_forwardGamepadNameChanged(int deviceId, const QString &name);
     void _q_forwardGamepadDisconnected(int deviceId);
-    void _q_forwardGamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value);
-    void _q_forwardGamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value);
-    void _q_forwardGamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button);
+    void _q_forwardGamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value, int64_t timestamp = 0);
+    void _q_forwardGamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value, int64_t timestamp = 0);
+    void _q_forwardGamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button, int64_t timestamp = 0);
 };
 
 void QGamepadManagerPrivate::_q_forwardGamepadConnected(int deviceId)
@@ -94,22 +94,22 @@ void QGamepadManagerPrivate::_q_forwardGamepadDisconnected(int deviceId)
     emit q->connectedGamepadsChanged();
 }
 
-void QGamepadManagerPrivate::_q_forwardGamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value)
+void QGamepadManagerPrivate::_q_forwardGamepadAxisEvent(int deviceId, QGamepadManager::GamepadAxis axis, double value, int64_t timestamp)
 {
     Q_Q(QGamepadManager);
-    emit q->gamepadAxisEvent(deviceId, axis, value);
+    emit q->gamepadAxisEvent(deviceId, axis, value, timestamp);
 }
 
-void QGamepadManagerPrivate::_q_forwardGamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value)
+void QGamepadManagerPrivate::_q_forwardGamepadButtonPressEvent(int deviceId, QGamepadManager::GamepadButton button, double value, int64_t timestamp)
 {
     Q_Q(QGamepadManager);
-    emit q->gamepadButtonPressEvent(deviceId, button, value);
+    emit q->gamepadButtonPressEvent(deviceId, button, value, timestamp);
 }
 
-void QGamepadManagerPrivate::_q_forwardGamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button)
+void QGamepadManagerPrivate::_q_forwardGamepadButtonReleaseEvent(int deviceId, QGamepadManager::GamepadButton button, int64_t timestamp)
 {
     Q_Q(QGamepadManager);
-    emit q->gamepadButtonReleaseEvent(deviceId, button);
+    emit q->gamepadButtonReleaseEvent(deviceId, button, timestamp);
 }
 
 void QGamepadManagerPrivate::loadBackend()

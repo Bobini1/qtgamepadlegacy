@@ -141,8 +141,8 @@ public Q_SLOTS:
 private:
     Q_DECLARE_PRIVATE(QGamepadKeyNavigation)
     Q_DISABLE_COPY(QGamepadKeyNavigation)
-    Q_PRIVATE_SLOT(d_func(), void _q_processGamepadButtonPressEvent(int, QGamepadManager::GamepadButton, double))
-    Q_PRIVATE_SLOT(d_func(), void _q_processGamepadButtonReleaseEvent(int, QGamepadManager::GamepadButton))
+    Q_PRIVATE_SLOT(d_func(), void _q_processGamepadButtonPressEvent(int, QGamepadManager::GamepadButton, double, int64_t))
+    Q_PRIVATE_SLOT(d_func(), void _q_processGamepadButtonReleaseEvent(int, QGamepadManager::GamepadButton, int64_t))
 };
 
 QT_END_NAMESPACE

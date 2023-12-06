@@ -430,6 +430,9 @@ void QEvdevGamepadDevice::saveData()
 
 void QEvdevGamepadDevice::processInputEvent(input_event *e)
 {
+    const std::chrono::milliseconds time =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::seconds{e->time.tv_sec} + std::chrono::microseconds{e->time.tv_usec});
     if (e->type == EV_KEY) {
         QGamepadManager::GamepadButton btn = QGamepadManager::ButtonInvalid;
         ButtonsMap::const_iterator it = m_buttonsMap.find(e->code);
@@ -462,9 +465,9 @@ void QEvdevGamepadDevice::processInputEvent(input_event *e)
 
         if (btn != QGamepadManager::ButtonInvalid) {
             if (pressed)
-                emit m_backend->gamepadButtonPressed(m_productId, btn, 1.0);
+                emit m_backend->gamepadButtonPressed(m_productId, btn, 1.0, time.count());
             else
-                emit m_backend->gamepadButtonReleased(m_productId, btn);
+                emit m_backend->gamepadButtonReleased(m_productId, btn, time.count());
         }
     } else if (e->type == EV_ABS) {
         if (m_configureAxis != QGamepadManager::AxisInvalid) {
@@ -524,27 +527,30 @@ void QEvdevGamepadDevice::processInputEvent(input_event *e)
         double val = info.normalized(e->value);
 
         if (info.gamepadAxis != QGamepadManager::AxisInvalid)
-            emit m_backend->gamepadAxisMoved(m_productId, info.gamepadAxis, val);
+        {
+            emit m_backend->gamepadAxisMoved(m_productId, info.gamepadAxis, val, time.count());
+        }
 
         if (info.gamepadMaxButton == info.gamepadMinButton &&
                 info.gamepadMaxButton != QGamepadManager::ButtonInvalid) {
             if (val)
-                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMaxButton, std::abs(val));
+                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMaxButton, std::abs(val), time.count());
             else
-                emit m_backend->gamepadButtonReleased(m_productId, info.gamepadMaxButton);
+                emit m_backend->gamepadButtonReleased(m_productId, info.gamepadMaxButton, time.count());
         } else {
             if (info.gamepadMaxButton != QGamepadManager::ButtonInvalid
                     && val == 1.0) {
                 info.gamepadLastButton = info.gamepadMaxButton;
-                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMaxButton, val);
+                auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds{e->time.tv_sec} + std::chrono::microseconds{e->time.tv_usec});
+                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMaxButton, val, time.count());
             } else if (info.gamepadMinButton != QGamepadManager::ButtonInvalid
                        && val == -1.0) {
                 info.gamepadLastButton = info.gamepadMinButton;
-                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMinButton, -val);
+                emit m_backend->gamepadButtonPressed(m_productId, info.gamepadMinButton, -val, time.count());
             } else if (!val && info.gamepadLastButton != QGamepadManager::ButtonInvalid) {
                 QGamepadManager::GamepadButton but = info.gamepadLastButton;
                 info.gamepadLastButton = QGamepadManager::ButtonInvalid;
-                emit m_backend->gamepadButtonReleased(m_productId, but);
+                emit m_backend->gamepadButtonReleased(m_productId, but, time.count());
             }
         }
     }
